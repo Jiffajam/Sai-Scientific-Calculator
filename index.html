@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sa'i Scientific Calculator</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #101010;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            padding: 18px;
+            background: #202020;
+        }
+
+        .title {
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            margin: 5px 0 15px;
+        }
+
+        #mode {
+            width: 100%;
+            height: 42px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 10px;
+            background: #075fa8;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        #display {
+            width: 100%;
+            height: 78px;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 12px;
+            background: #000;
+            color: white;
+            font-size: 30px;
+            text-align: right;
+            outline: none;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        button {
+            height: 55px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.94);
+        }
+
+        .number {
+            background: #505050;
+        }
+
+        .scientific {
+            background: #343434;
+            color: #00d9ff;
+        }
+
+        .special {
+            background: #343434;
+            color: #ffd700;
+        }
+
+        .operator {
+            background: #e88a00;
+        }
+
+        .clear {
+            background: #d00000;
+        }
+
+        .delete {
+            background: #707070;
+        }
+
+        .ans {
+            background: #6a0dad;
+        }
+
+        .equal {
+            background: #009b68;
+        }
+
+        .history-button {
+            width: 100%;
+            height: 50px;
+            margin-top: 16px;
+            background: #3c3c3c;
+            color: white;
+        }
+
+        .history-box {
+            display: none;
+            margin-top: 10px;
+            padding: 14px;
+            background: #111;
+            border-radius: 10px;
+        }
+
+        .history-box.show {
+            display: block;
+        }
+
+        .history-title {
+            color: white;
+            margin: 0 0 10px;
+            font-size: 19px;
+        }
+
+        #history {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            color: #ddd;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-size: 15px;
+        }
+
+        .clear-history {
+            width: 100%;
+            height: 44px;
+            margin-top: 10px;
+            background: #8b0000;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator">
+
+        <h2 class="title">
+            Sa'i Scientific Calculator
+        </h2>
+
+        <button
+            id="mode"
+            onclick="toggleMode()">
+            DEG
+        </button>
+
+        <input
+            type="text"
+            id="display"
+            value="0"
+            readonly
+        >
+
+        <div class="buttons">
+
+            <!-- Scientific -->
+            <button class="scientific" onclick="squareRoot()">√</button>
+            <button class="scientific" onclick="square()">x²</button>
+            <button class="scientific" onclick="power()">xʸ</button>
+            <button class="scientific" onclick="percentage()">%</button>
+
+            <button class="scientific" onclick="sin()">sin</button>
+            <button class="scientific" onclick="cos()">cos</button>
+            <button class="scientific" onclick="tan()">tan</button>
+            <button class="scientific" onclick="log()">log</button>
+
+            <button class="scientific" onclick="ln()">ln</button>
+            <button class="scientific" onclick="pi()">π</button>
+            <button class="scientific" onclick="euler()">e</button>
+            <button class="special" onclick="reciprocal()">1/x</button>
+
+            <button class="special" onclick="changeSign()">±</button>
+            <button class="special" onclick="factorial()">n!</button>
+            <button class="ans" onclick="useAnswer()">ANS</button>
+            <button class="delete" onclick="deleteNumber()">DEL</button>
+
+            <!-- Operators -->
+            <button class="clear" onclick="clearDisplay()">AC</button>
+            <button class="operator" onclick="chooseOperator('/')">÷</button>
+            <button class="operator" onclick="chooseOperator('*')">×</button>
+            <button class="operator" onclick="chooseOperator('-')">−</button>
+
+            <!-- Numbers -->
+            <button class="number" onclick="addNumber('7')">7</button>
+            <button class="number" onclick="addNumber('8')">8</button>
+            <button class="number" onclick="addNumber('9')">9</button>
+            <button class="operator" onclick="chooseOperator('+')">+</button>
+
+            <button class="number" onclick="addNumber('4')">4</button>
+            <button class="number" onclick="addNumber('5')">5</button>
+            <button class="number" onclick="addNumber('6')">6</button>
+            <button class="scientific" onclick="addNumber('(')">(</button>
+
+            <button class="number" onclick="addNumber('1')">1</button>
+            <button class="number" onclick="addNumber('2')">2</button>
+            <button class="number" onclick="addNumber('3')">3</button>
+            <button class="scientific" onclick="addNumber(')')">)</button>
+
+            <button class="number" onclick="addNumber('0')">0</button>
+            <button class="number" onclick="addNumber('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+
+        </div>
+
+        <button
+            class="history-button"
+            onclick="toggleHistory()">
+            History
+        </button>
+
+        <div
+            class="history-box"
+            id="historyBox">
+
+            <h3 class="history-title">
+                Calculation History
+            </h3>
+
+            <div id="history"></div>
+
+            <button
+                class="clear-history"
+                onclick="clearHistory()">
+                Clear History
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const display =
+            document.getElementById("display");
+
+        const history =
+            document.getElementById("history");
+
+        const historyBox =
+            document.getElementById("historyBox");
+
+        const modeButton =
+            document.getElementById("mode");
+
+        let lastAnswer = 0;
+
+        let angleMode = "DEG";
+
+
+        function toggleMode() {
+
+            if (angleMode === "DEG") {
+
+                angleMode = "RAD";
+                modeButton.textContent = "RAD";
+
+            } else {
+
+                angleMode = "DEG";
+                modeButton.textContent = "DEG";
+            }
+        }
+
+
+        function addNumber(number) {
+
+            if (
+                display.value === "0" ||
+                display.value === "Error"
+            ) {
+                display.value = number;
+            } else {
+                display.value += number;
+            }
+        }
+
+
+        function chooseOperator(operator) {
+
+            if (display.value === "Error") {
+                return;
+            }
+
+            display.value += operator;
+        }
+
+
+        function calculate() {
+
+            try {
+
+                let expression =
+                    display.value;
+
+                if (
+                    expression === "" ||
+                    expression === "Error"
+                ) {
+                    return;
+                }
+
+                if (
+                    !/^[0-9+\-*/().\s]+$/.test(expression)
+                ) {
+                    display.value = "Error";
+                    return;
+                }
+
+                let result =
+                    Function(
+                        "return " + expression
+                    )();
+
+                if (
+                    !Number.isFinite(result)
+                ) {
+                    display.value = "Error";
+                    return;
+                }
+
+                display.value = result;
+
+                lastAnswer = result;
+
+                addToHistory(
+                    expression,
+                    result
+                );
+
+            } catch (error) {
+
+                display.value = "Error";
+            }
+        }
+
+
+        function clearDisplay() {
+
+            display.value = "0";
+        }
+
+
+        function deleteNumber() {
+
+            if (
+                display.value === "Error" ||
+                display.value.length <= 1
+            ) {
+                display.value = "0";
+                return;
+            }
+
+            display.value =
+                display.value.slice(0, -1);
+        }
+
+
+        function useAnswer() {
+
+            display.value = lastAnswer;
+        }
+
+
+        function reciprocal() {
+
+            let number =
+                Number(display.value);
+
+            if (
+                !Number.isFinite(number) ||
+                number === 0
+            ) {
+                display.value = "Error";
+                return;
+            }
+
+            let result = 1 / number;
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "1/" + number,
+                result
+            );
+        }
+
+
+        function changeSign() {
+
+            if (display.value === "Error") {
+                return;
+            }
+
+            let number =
+                Number(display.value);
+
+            if (number === 0) {
+                return;
+            }
+
+            display.value = -number;
+        }
+
+
+        function factorial() {
+
+            let number =
+                Number(display.value);
+
+            if (
+                !Number.isInteger(number) ||
+                number < 0 ||
+                number > 170
+            ) {
+                display.value = "Error";
+                return;
+            }
+
+            let result = 1;
+
+            for (
+                let i = 1;
+                i <= number;
+                i++
+            ) {
+                result *= i;
+            }
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                number + "!",
+                result
+            );
+        }
+
+
+        function percentage() {
+
+            let number =
+                Number(display.value);
+
+            if (!Number.isFinite(number)) {
+                display.value = "Error";
+                return;
+            }
+
+            let result =
+                number / 100;
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                number + "%",
+                result
+            );
+        }
+
+
+        function squareRoot() {
+
+            let number =
+                Number(display.value);
+
+            if (
+                !Number.isFinite(number) ||
+                number < 0
+            ) {
+                display.value = "Error";
+                return;
+            }
+
+            let result =
+                Math.sqrt(number);
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "√" + number,
+                result
+            );
+        }
+
+
+        function square() {
+
+            let number =
+                Number(display.value);
+
+            if (!Number.isFinite(number)) {
+                display.value = "Error";
+                return;
+            }
+
+            let result =
+                number * number;
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                number + "²",
+                result
+            );
+        }
+
+
+        function power() {
+
+            let number =
+                Number(display.value);
+
+            if (!Number.isFinite(number)) {
+                display.value = "Error";
+                return;
+            }
+
+            display.value =
+                number + "**";
+        }
+
+
+        function getAngleInRadians(number) {
+
+            if (angleMode === "DEG") {
+
+                return (
+                    number * Math.PI / 180
+                );
+
+            }
+
+            return number;
+        }
+
+
+        function sin() {
+
+            let number =
+                Number(display.value);
+
+            if (!Number.isFinite(number)) {
+                display.value = "Error";
+                return;
+            }
+
+            let angle =
+                getAngleInRadians(number);
+
+            let result =
+                Number(
+                    Math.sin(angle)
+                    .toFixed(10)
+                );
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "sin(" +
+                number +
+                " " +
+                angleMode +
+                ")",
+                result
+            );
+        }
+
+
+        function cos() {
+
+            let number =
+                Number(display.value);
+
+            if (!Number.isFinite(number)) {
+                display.value = "Error";
+                return;
+            }
+
+            let angle =
+                getAngleInRadians(number);
+
+            let result =
+                Number(
+                    Math.cos(angle)
+                    .toFixed(10)
+                );
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "cos(" +
+                number +
+                " " +
+                angleMode +
+                ")",
+                result
+            );
+        }
+
+
+        function tan() {
+
+            let number =
+                Number(display.value);
+
+            if (!Number.isFinite(number)) {
+                display.value = "Error";
+                return;
+            }
+
+            let angle =
+                getAngleInRadians(number);
+
+            let result =
+                Number(
+                    Math.tan(angle)
+                    .toFixed(10)
+                );
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "tan(" +
+                number +
+                " " +
+                angleMode +
+                ")",
+                result
+            );
+        }
+
+
+        function log() {
+
+            let number =
+                Number(display.value);
+
+            if (
+                !Number.isFinite(number) ||
+                number <= 0
+            ) {
+                display.value = "Error";
+                return;
+            }
+
+            let result =
+                Math.log10(number);
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "log(" +
+                number +
+                ")",
+                result
+            );
+        }
+
+
+        function ln() {
+
+            let number =
+                Number(display.value);
+
+            if (
+                !Number.isFinite(number) ||
+                number <= 0
+            ) {
+                display.value = "Error";
+                return;
+            }
+
+            let result =
+                Math.log(number);
+
+            display.value = result;
+
+            lastAnswer = result;
+
+            addToHistory(
+                "ln(" +
+                number +
+                ")",
+                result
+            );
+        }
+
+
+        function pi() {
+
+            display.value =
+                Math.PI;
+        }
+
+
+        function euler() {
+
+            display.value =
+                Math.E;
+        }
+
+
+        function toggleHistory() {
+
+            historyBox.classList.toggle("show");
+        }
+
+
+        function addToHistory(
+            expression,
+            result
+        ) {
+
+            let historyItem =
+                document.createElement("div");
+
+            historyItem.className =
+                "history-item";
+
+            historyItem.textContent =
+                expression +
+                " = " +
+                result;
+
+            history.prepend(historyItem);
+        }
+
+
+        function clearHistory() {
+
+            history.innerHTML = "";
+        }
+
+    </script>
+
+</body>
+
+  </html>
