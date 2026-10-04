@@ -1,0 +1,11 @@
+{
+  "name": "Sa'i Scientific Calculator",
+  "short_name": "Sa'i Calculator",
+  "description": "A professional scientific calculator for everyday mathematical calculations.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101010",
+  "theme_color": "#202020",
+  "orientation": "portrait",
+  "icons": []
+}
